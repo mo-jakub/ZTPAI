@@ -1,0 +1,11 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    command: php -S 0.0.0.0:8000 -t symfony/public
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
