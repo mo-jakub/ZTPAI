@@ -10,7 +10,7 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
-    command: symfony server:start --allow-http
+    command: php -S 0.0.0.0:8000 -t ./public
 
   db:
     env_file:
