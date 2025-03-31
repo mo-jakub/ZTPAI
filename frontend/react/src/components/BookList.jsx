@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
@@ -25,14 +26,27 @@ const BookList = () => {
   return (
     <div>
       <h1>Book List</h1>
-      <ul>
-        {books.map((book) => (
-          <li key={book.id}>
-            <a href={`/books/${book.id}`}>{book.title}</a>
-          </li>
-        ))}
-      </ul>
-      <button onClick={fetchBooks}>Refresh</button>
+      <table border="1" cellPadding="10" style={{ width: '100%', textAlign: 'left' }}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {books.map((book) => (
+            <tr key={book.id}>
+              <td>{book.id}</td>
+              <td>{book.title}</td>
+              <td>
+                <Link to={`/books/${book.id}`}>View Details</Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button onClick={fetchBooks} style={{ marginTop: '20px' }}>Refresh</button>
     </div>
   );
 };
