@@ -2,69 +2,91 @@
 
 namespace App\Controller;
 
+use App\Entity\books;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BookController extends AbstractController
 {
-    private array $books = [
-        ['id' => 1, 'title' => 'Hobbit', 'author' =>'Tolkien'],
-        ['id' => 2, 'title' => 'Lord of the Rings', 'author' =>'Tolkien'],
-    ];
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
 
     #[Route('/api/books', name: 'get_books', methods: ['GET'])]
     public function getBooks(): JsonResponse
     {
-        return $this->json($this->books);
-    }
+        $books = $this->entityManager->getRepository(books::class)->findAll();
 
-    #[Route('/api/books', name: 'add_book', methods: ['POST'])]
-    public function addBooks(): JsonResponse
-    {
-        $newBook = [
-            'id' => count($this->books) + 1,
-            'title' => 'New Book',
-            'author' => 'Jan Kowalski',
-        ];
+        $data = array_map(function (books $book) {
+            return [
+                'id' => $book->getId(),
+                'title' => $book->getTitle(),
+                'description' => $book->getDescription(),
+                'cover' => $book->getCover(),
+            ];
+        }, $books);
 
-        $this->books[] = $newBook;
-
-        return $this->json(['message' => 'Book added successfully', 'user' => $newBook], 201);
+        return $this->json($data);
     }
 
     #[Route('/api/books/{id}', name: 'get_book_by_id', methods: ['GET'])]
     public function getBookById(int $id): JsonResponse
     {
-        $book = $this->findBookById($id);
+        $book = $this->entityManager->getRepository(books::class)->find($id);
+
         if (!$book) {
-            return $this->json(['error' => 'Book not found'], 404);
+            return $this->json(['error' => 'No book found for id ' . $id], 404);
         }
 
-        return $this->json($book);
+        $data = [
+            'id' => $book->getId(),
+            'title' => $book->getTitle(),
+            'description' => $book->getDescription(),
+            'cover' => $book->getCover(),
+        ];
+
+        return $this->json($data);
+    }
+
+    #[Route('/api/books', name: 'add_book', methods: ['POST'])]
+    public function addBooks(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $newBook = new books();
+        $newBook->setTitle($data['title'] ?? 'Default Title');
+        $newBook->setDescription($data['description'] ?? 'Default Description');
+        $newBook->setCover($data['cover'] ?? null);
+
+        $this->entityManager->persist($newBook);
+        $this->entityManager->flush();
+
+        return $this->json(['message' => 'Saved new book with id ' . $newBook->getId(), 'book' => [
+            'id' => $newBook->getId(),
+            'title' => $newBook->getTitle(),
+            'description' => $newBook->getDescription(),
+            'cover' => $newBook->getCover(),
+        ]], 201);
     }
 
     #[Route('/api/books/{id}', name: 'delete_book_by_id', methods: ['DELETE'])]
     public function deleteBookById(int $id): JsonResponse
     {
-        $book = $this->findBookById($id);
+        $book = $this->entityManager->getRepository(books::class)->find($id);
+
         if (!$book) {
-            return $this->json(['error' => 'Book not found'], 404);
+            return $this->json(['error' => 'No book found for id ' . $id], 404);
         }
 
-        $this->books = array_filter($this->books, fn($u) => $u['id'] !== $id);
-        $this->books = array_values($this->books);
+        $this->entityManager->remove($book);
+        $this->entityManager->flush();
 
-        return $this->json(['message' => 'Book deleted successfully']);
-    }
-
-    private function findBookById(int $id): ?array
-    {
-        foreach ($this->books as $book) {
-            if ($book['id'] === $id) {
-                return $book;
-            }
-        }
-        return null;
+        return $this->json(['message' => 'Book deleted successfully'], 200);
     }
 }
