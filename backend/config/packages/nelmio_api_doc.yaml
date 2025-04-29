@@ -1,0 +1,9 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Books API
+            description: Documentation for API that is managing books
+            version: 1.0.0
+    areas:
+        path_patterns:
+            - ^/api
