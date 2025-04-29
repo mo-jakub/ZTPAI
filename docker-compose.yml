@@ -10,7 +10,7 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
-    command: php -S 0.0.0.0:8000 -t ./public
+    command: symfony server:start --no-tls --allow-all-ip --no-interaction
 
   db:
     env_file:
