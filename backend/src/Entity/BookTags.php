@@ -6,10 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: "book_tags")]
-class book_tags
+class BookTags
 {
     #[ORM\Id]
-    #[ORM\OneToOne(targetEntity: \books::class, inversedBy: "bookTags")]
+    #[ORM\OneToOne(targetEntity: \Books::class, inversedBy: "bookTags")]
     #[ORM\JoinColumn(name: "id_book",
             referencedColumnName: "id",
             nullable: false,
@@ -17,31 +17,31 @@ class book_tags
     private $books;
 
     #[ORM\Id]
-    #[ORM\OneToOne(targetEntity: \tags::class, inversedBy: "bookTags")]
+    #[ORM\OneToOne(targetEntity: \Tags::class, inversedBy: "bookTags")]
     #[ORM\JoinColumn(name: "id_tag",
             referencedColumnName: "id",
             nullable: false,
             onDelete: "NO ACTION")]
     private $tags;
 
-    public function getBooks(): ?books
+    public function getBooks(): ?Books
     {
         return $this->books;
     }
 
-    public function setBooks(books $books): static
+    public function setBooks(Books $books): static
     {
         $this->books = $books;
 
         return $this;
     }
 
-    public function getTags(): ?tags
+    public function getTags(): ?Tags
     {
         return $this->tags;
     }
 
-    public function setTags(tags $tags): static
+    public function setTags(Tags $tags): static
     {
         $this->tags = $tags;
 

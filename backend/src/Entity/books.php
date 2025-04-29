@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: "books")]
 #[ORM\UniqueConstraint(name: "books_title_description_key", columns: ["title","description"])]
-class books
+class Books
 {
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
@@ -25,16 +25,16 @@ class books
     #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $cover;
 
-    #[ORM\OneToOne(targetEntity: \book_tags::class, mappedBy: "books")]
+    #[ORM\OneToOne(targetEntity: \BookTags::class, mappedBy: "books")]
     private $bookTags;
 
-    #[ORM\OneToOne(targetEntity: \book_genres::class, mappedBy: "books")]
+    #[ORM\OneToOne(targetEntity: \BookGenres::class, mappedBy: "books")]
     private $bookGenres;
 
-    #[ORM\OneToOne(targetEntity: \book_authors::class, mappedBy: "books")]
+    #[ORM\OneToOne(targetEntity: \BookAuthors::class, mappedBy: "books")]
     private $bookAuthors;
 
-    #[ORM\OneToMany(targetEntity: \comments::class, mappedBy: "books")]
+    #[ORM\OneToMany(targetEntity: \Comments::class, mappedBy: "books")]
     private $comments;
 
     public function __construct()
@@ -83,19 +83,17 @@ class books
         return $this;
     }
 
-    public function getBookTags(): ?book_tags
+    public function getBookTags(): ?BookTags
     {
         return $this->bookTags;
     }
 
-    public function setBookTags(?book_tags $bookTags): static
+    public function setBookTags(?BookTags $bookTags): static
     {
-        // unset the owning side of the relation if necessary
         if ($bookTags === null && $this->bookTags !== null) {
             $this->bookTags->setBooks(null);
         }
 
-        // set the owning side of the relation if necessary
         if ($bookTags !== null && $bookTags->getBooks() !== $this) {
             $bookTags->setBooks($this);
         }
@@ -105,19 +103,17 @@ class books
         return $this;
     }
 
-    public function getBookGenres(): ?book_genres
+    public function getBookGenres(): ?BookGenres
     {
         return $this->bookGenres;
     }
 
-    public function setBookGenres(?book_genres $bookGenres): static
+    public function setBookGenres(?BookGenres $bookGenres): static
     {
-        // unset the owning side of the relation if necessary
         if ($bookGenres === null && $this->bookGenres !== null) {
             $this->bookGenres->setBooks(null);
         }
 
-        // set the owning side of the relation if necessary
         if ($bookGenres !== null && $bookGenres->getBooks() !== $this) {
             $bookGenres->setBooks($this);
         }
@@ -127,19 +123,17 @@ class books
         return $this;
     }
 
-    public function getBookAuthors(): ?book_authors
+    public function getBookAuthors(): ?BookAuthors
     {
         return $this->bookAuthors;
     }
 
-    public function setBookAuthors(?book_authors $bookAuthors): static
+    public function setBookAuthors(?BookAuthors $bookAuthors): static
     {
-        // unset the owning side of the relation if necessary
         if ($bookAuthors === null && $this->bookAuthors !== null) {
             $this->bookAuthors->setBooks(null);
         }
 
-        // set the owning side of the relation if necessary
         if ($bookAuthors !== null && $bookAuthors->getBooks() !== $this) {
             $bookAuthors->setBooks($this);
         }
@@ -149,15 +143,12 @@ class books
         return $this;
     }
 
-    /**
-     * @return Collection<int, comments>
-     */
     public function getComments(): Collection
     {
         return $this->comments;
     }
 
-    public function addComment(comments $comment): static
+    public function addComment(Comments $comment): static
     {
         if (!$this->comments->contains($comment)) {
             $this->comments->add($comment);
@@ -167,10 +158,9 @@ class books
         return $this;
     }
 
-    public function removeComment(comments $comment): static
+    public function removeComment(Comments $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
             if ($comment->getBooks() === $this) {
                 $comment->setBooks(null);
             }

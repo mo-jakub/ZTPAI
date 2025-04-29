@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: "authors")]
-class authors
+class Authors
 {
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
@@ -16,7 +16,7 @@ class authors
     #[ORM\Column(type: "string", length: 255, nullable: false)]
     private $author;
 
-    #[ORM\OneToOne(targetEntity: \book_authors::class, mappedBy: "authors")]
+    #[ORM\OneToOne(targetEntity: \BookAuthors::class, mappedBy: "authors")]
     private $bookAuthors;
 
     public function getId(): ?int
@@ -36,12 +36,12 @@ class authors
         return $this;
     }
 
-    public function getBookAuthors(): ?book_authors
+    public function getBookAuthors(): ?BookAuthors
     {
         return $this->bookAuthors;
     }
 
-    public function setBookAuthors(?book_authors $bookAuthors): static
+    public function setBookAuthors(?BookAuthors $bookAuthors): static
     {
         // unset the owning side of the relation if necessary
         if ($bookAuthors === null && $this->bookAuthors !== null) {

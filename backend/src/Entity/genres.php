@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: "genres")]
 #[ORM\UniqueConstraint(name: "genres_genre_key", columns: ["genre"])]
-class genres
+class Genres
 {
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
@@ -17,7 +17,7 @@ class genres
     #[ORM\Column(type: "string", length: 100, nullable: false)]
     private $genre;
 
-    #[ORM\OneToOne(targetEntity: \book_genres::class, mappedBy: "genres")]
+    #[ORM\OneToOne(targetEntity: \BookGenres::class, mappedBy: "genres")]
     private $bookGenres;
 
     public function getId(): ?int
@@ -37,12 +37,12 @@ class genres
         return $this;
     }
 
-    public function getBookGenres(): ?book_genres
+    public function getBookGenres(): ?BookGenres
     {
         return $this->bookGenres;
     }
 
-    public function setBookGenres(?book_genres $bookGenres): static
+    public function setBookGenres(?BookGenres $bookGenres): static
     {
         // unset the owning side of the relation if necessary
         if ($bookGenres === null && $this->bookGenres !== null) {

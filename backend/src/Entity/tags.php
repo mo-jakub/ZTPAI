@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: "tags")]
 #[ORM\UniqueConstraint(name: "tags_tag_key", columns: ["tag"])]
-class tags
+class Tags
 {
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
@@ -17,7 +17,7 @@ class tags
     #[ORM\Column(type: "string", length: 100, nullable: false)]
     private $tag;
 
-    #[ORM\OneToOne(targetEntity: \book_tags::class, mappedBy: "tags")]
+    #[ORM\OneToOne(targetEntity: \BookTags::class, mappedBy: "tags")]
     private $bookTags;
 
     public function getId(): ?int
@@ -37,12 +37,12 @@ class tags
         return $this;
     }
 
-    public function getBookTags(): ?book_tags
+    public function getBookTags(): ?BookTags
     {
         return $this->bookTags;
     }
 
-    public function setBookTags(?book_tags $bookTags): static
+    public function setBookTags(?BookTags $bookTags): static
     {
         // unset the owning side of the relation if necessary
         if ($bookTags === null && $this->bookTags !== null) {

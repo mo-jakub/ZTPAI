@@ -6,10 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: "book_authors")]
-class book_authors
+class BookAuthors
 {
     #[ORM\Id]
-    #[ORM\OneToOne(targetEntity: \books::class, inversedBy: "bookAuthors")]
+    #[ORM\OneToOne(targetEntity: \Books::class, inversedBy: "bookAuthors")]
     #[ORM\JoinColumn(name: "id_book",
             referencedColumnName: "id",
             nullable: false,
@@ -17,31 +17,31 @@ class book_authors
     private $books;
 
     #[ORM\Id]
-    #[ORM\OneToOne(targetEntity: \authors::class, inversedBy: "bookAuthors")]
+    #[ORM\OneToOne(targetEntity: \Authors::class, inversedBy: "bookAuthors")]
     #[ORM\JoinColumn(name: "id_author",
             referencedColumnName: "id",
             nullable: false,
             onDelete: "NO ACTION")]
     private $authors;
 
-    public function getBooks(): ?books
+    public function getBooks(): ?Books
     {
         return $this->books;
     }
 
-    public function setBooks(books $books): static
+    public function setBooks(Books $books): static
     {
         $this->books = $books;
 
         return $this;
     }
 
-    public function getAuthors(): ?authors
+    public function getAuthors(): ?Authors
     {
         return $this->authors;
     }
 
-    public function setAuthors(authors $authors): static
+    public function setAuthors(Authors $authors): static
     {
         $this->authors = $authors;
 

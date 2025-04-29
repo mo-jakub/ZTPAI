@@ -2,12 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: "comments")]
-class comments
+class Comments
 {
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
@@ -17,21 +16,15 @@ class comments
     #[ORM\Column(type: "string", length: 255, nullable: false)]
     private $comment;
 
-    #[ORM\Column(type: "datetime", nullable: false, options: ["default"=>"NOW()"])]
+    #[ORM\Column(type: "datetime", nullable: false)]
     private $date;
 
-    #[ORM\ManyToOne(targetEntity: \users::class, inversedBy: "comments")]
-    #[ORM\JoinColumn(name: "id_user",
-            referencedColumnName: "id",
-            nullable: false,
-            onDelete: "NO ACTION")]
-    private $users;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\User::class, inversedBy: "comments")]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id", nullable: false, onDelete: "NO ACTION")]
+    private $user;
 
-    #[ORM\ManyToOne(targetEntity: \books::class, inversedBy: "comments")]
-    #[ORM\JoinColumn(name: "id_book",
-            referencedColumnName: "id",
-            nullable: false,
-            onDelete: "NO ACTION")]
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Books::class, inversedBy: "comments")]
+    #[ORM\JoinColumn(name: "id_book", referencedColumnName: "id", nullable: false, onDelete: "NO ACTION")]
     private $books;
 
     public function getId(): ?int
@@ -63,24 +56,24 @@ class comments
         return $this;
     }
 
-    public function getUsers(): ?users
+    public function getUser(): ?User
     {
-        return $this->users;
+        return $this->user;
     }
 
-    public function setUsers(?users $users): static
+    public function setUser(?User $user): static
     {
-        $this->users = $users;
+        $this->user = $user;
 
         return $this;
     }
 
-    public function getBooks(): ?books
+    public function getBooks(): ?Books
     {
         return $this->books;
     }
 
-    public function setBooks(?books $books): static
+    public function setBooks(?Books $books): static
     {
         $this->books = $books;
 

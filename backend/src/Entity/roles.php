@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: "roles")]
 #[ORM\UniqueConstraint(name: "roles_role_key", columns: ["role"])]
-class roles
+class Roles
 {
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
@@ -19,7 +19,7 @@ class roles
     #[ORM\Column(type: "string", length: 100, nullable: false)]
     private $role;
 
-    #[ORM\OneToMany(targetEntity: \admins::class, mappedBy: "roles")]
+    #[ORM\OneToMany(targetEntity: Admin::class, mappedBy: "roles")]
     private $admins;
 
     public function __construct()
@@ -45,14 +45,14 @@ class roles
     }
 
     /**
-     * @return Collection<int, admins>
+     * @return Collection<int, Admin>
      */
     public function getAdmins(): Collection
     {
         return $this->admins;
     }
 
-    public function addAdmin(admins $admin): static
+    public function addAdmin(Admin $admin): static
     {
         if (!$this->admins->contains($admin)) {
             $this->admins->add($admin);
@@ -62,7 +62,7 @@ class roles
         return $this;
     }
 
-    public function removeAdmin(admins $admin): static
+    public function removeAdmin(Admin $admin): static
     {
         if ($this->admins->removeElement($admin)) {
             // set the owning side to null (unless already changed)

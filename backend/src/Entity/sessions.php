@@ -6,9 +6,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: "sessions")]
-#[ORM\UniqueConstraint(name: "sessions_session_token_key", columns: ["session_token"])]
-class sessions
+#[ORM\Table(name: "Sessions")]
+#[ORM\UniqueConstraint(name: "Sessions_session_token_key", columns: ["session_token"])]
+class Sessions
 {
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
@@ -21,12 +21,12 @@ class sessions
     #[ORM\Column(type: "datetime", nullable: false)]
     private $expiration_date;
 
-    #[ORM\ManyToOne(targetEntity: \users::class, inversedBy: "sessions")]
+    #[ORM\ManyToOne(targetEntity: \user::class, inversedBy: "Sessions")]
     #[ORM\JoinColumn(name: "id_user",
             referencedColumnName: "id",
             nullable: false,
             onDelete: "NO ACTION")]
-    private $users;
+    private $user;
 
     public function getId(): ?int
     {
@@ -57,14 +57,14 @@ class sessions
         return $this;
     }
 
-    public function getUsers(): ?users
+    public function getUser(): ?user
     {
-        return $this->users;
+        return $this->user;
     }
 
-    public function setUsers(?users $users): static
+    public function setUser(?user $user): static
     {
-        $this->users = $users;
+        $this->user = $user;
 
         return $this;
     }
