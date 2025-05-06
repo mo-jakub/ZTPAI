@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
 
-const AddBookForm = () => {
+function parseJwt(token) {
+  if (!token) return null;
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    return null;
+  }
+}
+
+const AddBookForm = ({ token }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [cover, setCover] = useState('');
+
+  const payload = parseJwt(token);
+  const isAdmin = payload?.roles?.includes('ROLE_ADMIN');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -11,6 +23,7 @@ const AddBookForm = () => {
       const response = await fetch('http://localhost:8000/api/books', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ title, description, cover }),
@@ -28,6 +41,10 @@ const AddBookForm = () => {
     }
   };
 
+  if (!isAdmin || !token) {
+    return <div style={{ color: 'red', textAlign: 'center' }}>Access denied. Admins only.</div>;
+  }
+  
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: '0 auto' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Add New Book</h2>

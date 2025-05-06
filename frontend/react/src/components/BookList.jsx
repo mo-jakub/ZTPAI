@@ -1,14 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const BookList = () => {
+function parseJwt(token) {
+  if (!token) return null;
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    return null;
+  }
+}
+
+const BookList = ({ token }) => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchBooks = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/books');
+      const response = await fetch('http://localhost:8000/api/books', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
+      
       setBooks(data);
     } catch (error) {
       console.error('Error fetching books:', error);
