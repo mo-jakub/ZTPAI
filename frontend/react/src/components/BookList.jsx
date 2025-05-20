@@ -16,7 +16,7 @@ const BookList = ({ token }) => {
 
   const fetchBooks = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/books', {
+      const response = await fetch('/api/books', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

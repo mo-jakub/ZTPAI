@@ -20,7 +20,7 @@ const AddBookForm = ({ token }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/api/books', {
+      const response = await fetch('/api/books', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

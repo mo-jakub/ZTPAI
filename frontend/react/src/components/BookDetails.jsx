@@ -10,7 +10,7 @@ const BookDetails = () => {
 
   const fetchBook = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/books/${id}`);
+      const response = await fetch(`/api/books/${id}`);
       if (response.status === 404) {
         setError(true);
         return;
