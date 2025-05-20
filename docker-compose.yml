@@ -1,4 +1,21 @@
 services:
+  rabbitmq:
+      image: rabbitmq:management
+      env_file:
+        - ./.env
+      container_name: rabbitmq
+      ports:
+        - "${RABBITMQ_NODE_PORT_EXTERNAL:-5672}:${RABBITMQ_NODE_PORT:-5672}" # RabbitMQ default port
+        - "${RABBITMQ_MNGMNT_PORT_EXTERNAL:-15672}:15672" # RabbitMQ management plugin port
+      environment:
+        RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER:-guest}"
+        RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS:-guest}"
+      healthcheck:
+        test: >
+          rabbitmq-diagnostics check_port_connectivity
+        interval: 5s
+        timeout: 5s
+        retries: 12
   php:
     env_file:
       - ./.env
