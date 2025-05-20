@@ -25,12 +25,14 @@ ENV PHP_EXTENSIONS="\
     pgsql \
     pdo_pgsql"
 
-RUN apk add --no-cache --virtual .build-deps $BUILD_DEPS \
+RUN apk add --no-cache --virtual .build-deps $BUILD_DEPS rabbitmq-c-dev \
     && docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install -j "$(nproc)" $PHP_EXTENSIONS \
+    && pecl install amqp \
+    && docker-php-ext-enable amqp \
     && apk del .build-deps
 
-RUN apk add --no-cache --virtual .run-deps $RUN_DEPS
+RUN apk add --no-cache --virtual .run-deps $RUN_DEPS rabbitmq-c
 
 RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.alpine.sh' | bash && \
     apk add --no-cache symfony-cli
