@@ -26,27 +26,39 @@ const RegisterForm = () => {
   };
 
   return (
-    <form onSubmit={handleRegister} style={{ marginBottom: 30 }}>
-      <h2>Register</h2>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        required
-        onChange={e => setEmail(e.target.value)}
-        style={{ margin: 5 }}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        required
-        onChange={e => setPassword(e.target.value)}
-        style={{ margin: 5 }}
-      />
-      <button type="submit">Register</button>
-      <div>{msg}</div>
-    </form>
+    <main class="page">
+      <div class="info">
+        <img src="/images/on-page-logo.svg" alt="Logo" class="on-page-logo"/>
+        <h2>Join us now.</h2>
+        <p>So that you can share your thoughts</p>
+        <p>regarding all the books</p>
+        <p>and discuss them with others.</p>
+        <p>It's free and easy.</p>
+      </div>
+      <div class="auth-form">
+        <form onSubmit={handleRegister} style={{ marginBottom: 30 }}>
+          <h2>Create an Account</h2>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            required
+            onChange={e => setEmail(e.target.value)}
+            style={{ margin: 5 }}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            required
+            onChange={e => setPassword(e.target.value)}
+            style={{ margin: 5 }}
+          />
+          <button type="submit">Sign Up</button>
+          <div>{msg}</div>
+        </form>
+      </div>
+    </main>
   );
 };
 

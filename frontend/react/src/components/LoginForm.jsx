@@ -27,27 +27,35 @@ const LoginForm = ({ onToken }) => {
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <h2>Login</h2>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        required
-        onChange={e => setEmail(e.target.value)}
-        style={{ margin: 5 }}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        required
-        onChange={e => setPassword(e.target.value)}
-        style={{ margin: 5 }}
-      />
-      <button type="submit">Login</button>
-      <div>{msg}</div>
-    </form>
+    <main class="page">
+      <div class="info">
+        <img src="/images/on-page-logo.svg" alt="Logo" class="on-page-logo"/>
+        <h2>We're glad to have you back.</h2>
+      </div>
+      <div class="auth-form">
+        <form onSubmit={handleLogin}>
+          <h2>Log Into an Existing Account</h2>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            required
+            onChange={e => setEmail(e.target.value)}
+            style={{ margin: 5 }}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            required
+            onChange={e => setPassword(e.target.value)}
+            style={{ margin: 5 }}
+          />
+          <button type="submit">Login</button>
+          <div>{msg}</div>
+        </form>
+      </div>
+    </main>
   );
 };
 
