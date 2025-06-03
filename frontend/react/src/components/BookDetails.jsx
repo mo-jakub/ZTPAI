@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 function parseJwt(token) {
   if (!token) return null;
@@ -59,35 +59,35 @@ const BookDetails = ({ token }) => {
   }, [id]);
 
   const handleAddComment = async e => {
-  e.preventDefault();
-  setCommentMsg('');
-  if (!token) {
-    setCommentMsg('You must be logged in to comment.');
-    return;
-  }
-  const res = await fetch(`/api/comments/book/${id}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ comment: commentText })
-  });
-  if (res.ok) {
-    setCommentText('');
-    setCommentMsg('Comment added!');
-    fetchComments();
-  } else {
-    let data = {};
-    try {
-      data = await res.json();
-    } catch {
-      setCommentMsg('Failed to add comment.');
+    e.preventDefault();
+    setCommentMsg('');
+    if (!token) {
+      setCommentMsg('You must be logged in to comment.');
       return;
     }
-    setCommentMsg(data.error || 'Failed to add comment.');
-  }
-};
+    const res = await fetch(`/api/comments/book/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ comment: commentText })
+    });
+    if (res.ok) {
+      setCommentText('');
+      setCommentMsg('Comment added!');
+      fetchComments();
+    } else {
+      let data = {};
+      try {
+        data = await res.json();
+      } catch {
+        setCommentMsg('Failed to add comment.');
+        return;
+      }
+      setCommentMsg(data.error || 'Failed to add comment.');
+    }
+  };
 
   const handleDeleteComment = async commentId => {
     if (!token) return;
@@ -100,6 +100,11 @@ const BookDetails = ({ token }) => {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Book not found</p>;
+  if (!book) return <p>No book data.</p>;
+
+  const authors = book.authors || [];
+  const genres = book.genres || [];
+  const tags = book.tags || [];
 
   return (
     <div>
@@ -126,6 +131,48 @@ const BookDetails = ({ token }) => {
               </td>
             </tr>
           )}
+          <tr>
+            <th>Authors</th>
+            <td>
+              {authors.length === 0 && <span>No authors</span>}
+              {authors.map((author, idx) => (
+                <span key={author.id}>
+                  <Link to={`/authors/${author.id}`} className="nav-link">
+                    {author.author}
+                  </Link>
+                  {idx < authors.length - 1 ? ' ' : ''}
+                </span>
+              ))}
+            </td>
+          </tr>
+          <tr>
+            <th>Genres</th>
+            <td>
+              {genres.length === 0 && <span>No genres</span>}
+              {genres.map((genre, idx) => (
+                <span key={genre.id}>
+                  <Link to={`/genres/${genre.id}`} className="nav-link">
+                    {genre.genre}
+                  </Link>
+                  {idx < genres.length - 1 ? ' ' : ''}
+                </span>
+              ))}
+            </td>
+          </tr>
+          <tr>
+            <th>Tags</th>
+            <td>
+              {tags.length === 0 && <span>No tags</span>}
+              {tags.map((tag, idx) => (
+                <span key={tag.id}>
+                  <Link to={`/tags/${tag.id}`} className="nav-link">
+                    {tag.tag}
+                  </Link>
+                  {idx < tags.length - 1 ? ' ' : ''}
+                </span>
+              ))}
+            </td>
+          </tr>
         </tbody>
       </table>
 

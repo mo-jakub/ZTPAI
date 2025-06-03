@@ -103,11 +103,50 @@ class BookController extends AbstractController
             return $this->json(['error' => 'No book found for id ' . $id], 404);
         }
 
+        $bookAuthors = $this->entityManager->getRepository(\App\Entity\BookAuthors::class)->findBy(['books' => $book]);
+        $authors = [];
+        foreach ($bookAuthors as $ba) {
+            $author = $ba->getAuthors();
+            if ($author) {
+                $authors[] = [
+                    'id' => $author->getId(),
+                    'author' => $author->getAuthor(),
+                ];
+            }
+        }
+
+        $bookGenres = $this->entityManager->getRepository(\App\Entity\BookGenres::class)->findBy(['books' => $book]);
+        $genres = [];
+        foreach ($bookGenres as $bg) {
+            $genre = $bg->getGenres();
+            if ($genre) {
+                $genres[] = [
+                    'id' => $genre->getId(),
+                    'genre' => $genre->getGenre(),
+                ];
+            }
+        }
+
+        $bookTags = $this->entityManager->getRepository(\App\Entity\BookTags::class)->findBy(['books' => $book]);
+        $tags = [];
+        foreach ($bookTags as $bt) {
+            $tag = $bt->getTags();
+            if ($tag) {
+                $tags[] = [
+                    'id' => $tag->getId(),
+                    'tag' => $tag->getTag(),
+                ];
+            }
+        }
+
         $data = [
             'id' => $book->getId(),
             'title' => $book->getTitle(),
             'description' => $book->getDescription(),
             'cover' => $book->getCover(),
+            'authors' => $authors,
+            'genres' => $genres,
+            'tags' => $tags,
         ];
 
         return $this->json($data);
