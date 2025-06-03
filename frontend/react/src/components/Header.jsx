@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 function isAdmin(token) {
   if (!token) return false;
@@ -22,6 +22,16 @@ function parseJwt(token) {
 
 const Header = ({ token, onLogout }) => {
   const user = parseJwt(token);
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = e => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/books?search=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
+
   return (
     <header>
       <div className="container">
@@ -43,8 +53,13 @@ const Header = ({ token, onLogout }) => {
             Tags
           </Link>
         </nav>
-        <form className="search-bar desktop-search-bar">
-          <input type="text" placeholder="Search by title or author" />
+        <form className="search-bar desktop-search-bar" onSubmit={handleSearch}>
+          <input
+            type="text"
+            placeholder="Search by title or author"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
         </form>
         <nav className="nav-wrapper auth">
           {token ? (

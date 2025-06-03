@@ -40,11 +40,22 @@ class BookController extends AbstractController
             )
         ]
     )]
-    public function getBooks(): JsonResponse
+    #[Route('/api/books', name: 'get_books', methods: ['GET'])]
+    public function getBooks(Request $request): JsonResponse
     {
-        $books = $this->entityManager->getRepository(books::class)->findAll();
+        $search = $request->query->get('search');
+        $repo = $this->entityManager->getRepository(Books::class);
 
-        $data = array_map(function (books $book) {
+        if ($search) {
+            $qb = $repo->createQueryBuilder('b');
+            $qb->where('LOWER(b.title) LIKE :search')
+            ->setParameter('search', '%' . strtolower($search) . '%');
+            $books = $qb->getQuery()->getResult();
+        } else {
+            $books = $repo->findAll();
+        }
+
+        $data = array_map(function (Books $book) {
             return [
                 'id' => $book->getId(),
                 'title' => $book->getTitle(),
