@@ -21,7 +21,6 @@ class BookController extends AbstractController
     }
 
     #[Route('/api/books', name: 'get_books', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     #[OA\Get(
         path: '/api/books',
         summary: 'Returns all books',
@@ -58,7 +57,6 @@ class BookController extends AbstractController
     }
 
     #[Route('/api/books/{id}', name: 'get_book_by_id', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     #[OA\Get(
         path: '/api/books/{id}',
         parameters: [

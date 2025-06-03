@@ -21,7 +21,6 @@ final class CommentsController extends AbstractController
     }
 
     #[Route('/api/comments/book/{bookId}', name: 'get_comments_by_book', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function getCommentsByBook(int $bookId): JsonResponse
     {
         $book = $this->entityManager->getRepository(Books::class)->find($bookId);
@@ -36,10 +35,7 @@ final class CommentsController extends AbstractController
                 'id' => $comment->getId(),
                 'comment' => $comment->getComment(),
                 'date' => $comment->getDate(),
-                'userId' => [
-                    'id' => $comment->getUser()->getId(),
-                    'username' => $comment->getUser()->getUsername(),
-                ],
+                'userId' => $comment->getUser() ? $comment->getUser()->getId() : null,
             ];
         }, $comments);
 
@@ -75,6 +71,7 @@ final class CommentsController extends AbstractController
                 'id' => $comment->getId(),
                 'comment' => $comment->getComment(),
                 'date' => $comment->getDate(),
+                'userId' => $comment->getUser() ? $comment->getUser()->getId() : null,
             ]
         ], 201);
     }

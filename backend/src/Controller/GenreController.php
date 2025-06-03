@@ -22,7 +22,6 @@ final class GenreController extends AbstractController
     }
 
     #[Route('/api/genres', name: 'get_genres', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function getGenres(): JsonResponse
     {
         $genres = $this->entityManager->getRepository(Genres::class)->findAll();
@@ -38,7 +37,6 @@ final class GenreController extends AbstractController
     }
 
     #[Route('/api/genres/{id}', name: 'get_books_by_genre', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function getBooksByGenre(int $id): JsonResponse
     {
         $genre = $this->entityManager->getRepository(Genres::class)->find($id);

@@ -22,7 +22,6 @@ final class TagController extends AbstractController
     }
 
     #[Route('/api/tags', name: 'get_tags', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function getTags(): JsonResponse
     {
         $tags = $this->entityManager->getRepository(Tags::class)->findAll();
@@ -38,7 +37,6 @@ final class TagController extends AbstractController
     }
 
     #[Route('/api/tags/{id}', name: 'get_books_by_tag', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function getBooksByTag(int $id): JsonResponse
     {
         $tag = $this->entityManager->getRepository(Tags::class)->find($id);

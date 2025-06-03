@@ -22,7 +22,6 @@ final class AuthorController extends AbstractController
     }
 
     #[Route('/api/authors', name: 'get_authors', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function getAuthors(): JsonResponse
     {
         $authors = $this->entityManager->getRepository(Authors::class)->findAll();
@@ -38,7 +37,6 @@ final class AuthorController extends AbstractController
     }
 
     #[Route('/api/authors/{id}', name: 'get_books_by_author', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function getBooksByAuthor(int $id): JsonResponse
     {
         $author = $this->entityManager->getRepository(Authors::class)->find($id);
