@@ -53,7 +53,7 @@ const BookList = ({ token }) => {
         {books.length === 0 && <li>No books found.</li>}
         {books.map(book => (
           <li key={book.id}>
-            <Link to={`/books/${book.id}`} className='nav-link'>{book.title}</Link>
+            <Link to={`/books/${book.id}`} className='nav-link' style={{ justifyContent: 'center' }}>{book.title}</Link>
             {showDelete && (
               <button
                 onClick={() => handleDelete(book.id)}

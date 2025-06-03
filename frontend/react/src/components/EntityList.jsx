@@ -73,7 +73,7 @@ const EntityList = ({ token, entityType: propEntityType }) => {
     <ul>
       {entities.map(e => (
         <li key={e.id} style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-          <Link to={config.link(e.id)} className='nav-link'>
+          <Link to={config.link(e.id)} className='nav-link' style={{ justifyContent: 'center' }}>
             {e[config.display]}
           </Link>
           {showDelete && (

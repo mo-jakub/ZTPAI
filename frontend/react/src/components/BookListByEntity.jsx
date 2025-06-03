@@ -53,7 +53,7 @@ const BookListByEntity = () => {
         {books.length === 0 && <li>No books found.</li>}
         {books.map(book => (
           <li key={book.id} style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-            <Link to={`/books/${book.id}`} className='nav-link'>
+            <Link to={`/books/${book.id}`} className='nav-link' style={{ justifyContent: 'center'}}>
               {book.title}
             </Link>
             {book.author && <> by {book.author}</>}
