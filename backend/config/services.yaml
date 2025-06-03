@@ -39,5 +39,9 @@ services:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
 
+    App\Service\SecurityService:
+        arguments:
+            $jwtManager: '@lexik_jwt_authentication.jwt_manager'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
