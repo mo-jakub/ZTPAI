@@ -34,19 +34,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToMany(targetEntity: Admin::class, mappedBy: "users")]
-    private ?Collection $admins = null;
-
-    #[ORM\OneToMany(targetEntity: Sessions::class, mappedBy: "users")]
-    private ?Collection $Sessions = null;
-
     #[ORM\OneToMany(targetEntity: Comments::class, mappedBy: "users")]
     private ?Collection $comments = null;
 
     public function __construct()
     {
-        $this->admins = new ArrayCollection();
-        $this->Sessions = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }
 
