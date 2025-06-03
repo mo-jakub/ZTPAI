@@ -3,28 +3,26 @@
 namespace App\Controller;
 
 use App\Entity\Tags;
-use App\Entity\BookTags;
-use App\Entity\Books;
+use App\Service\TagService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class TagController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
+    private TagService $tagService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(TagService $tagService)
     {
-        $this->entityManager = $entityManager;
+        $this->tagService = $tagService;
     }
 
     #[Route('/api/tags', name: 'get_tags', methods: ['GET'])]
     public function getTags(): JsonResponse
     {
-        $tags = $this->entityManager->getRepository(Tags::class)->findAll();
+        $tags = $this->tagService->getAllTags();
 
         $data = array_map(function (Tags $tag) {
             return [
@@ -39,25 +37,12 @@ final class TagController extends AbstractController
     #[Route('/api/tags/{id}', name: 'get_books_by_tag', methods: ['GET'])]
     public function getBooksByTag(int $id): JsonResponse
     {
-        $tag = $this->entityManager->getRepository(Tags::class)->find($id);
+        $tag = $this->tagService->getTagById($id);
         if (!$tag) {
             return $this->json(['error' => 'No tag found for id ' . $id], 404);
         }
 
-        $bookTags = $this->entityManager->getRepository(BookTags::class)->findBy(['tags' => $tag]);
-
-        $books = [];
-        foreach ($bookTags as $ba) {
-            $book = $ba->getBooks();
-            if ($book) {
-                $books[] = [
-                    'id' => $book->getId(),
-                    'title' => $book->getTitle(),
-                    'description' => $book->getDescription(),
-                    'cover' => $book->getCover(),
-                ];
-            }
-        }
+        $books = $this->tagService->getBooksByTag($tag);
 
         return $this->json($books);
     }
@@ -72,11 +57,7 @@ final class TagController extends AbstractController
             return $this->json(['error' => 'Tag name is required'], 400);
         }
 
-        $tag = new Tags();
-        $tag->setTag($data['tag']);
-
-        $this->entityManager->persist($tag);
-        $this->entityManager->flush();
+        $tag = $this->tagService->addTag($data['tag']);
 
         return $this->json([
             'message' => 'Tag added successfully',
@@ -91,18 +72,12 @@ final class TagController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function deleteTag(int $id): JsonResponse
     {
-        $tag = $this->entityManager->getRepository(Tags::class)->find($id);
+        $tag = $this->tagService->getTagById($id);
         if (!$tag) {
             return $this->json(['error' => 'No tag found for id ' . $id], 404);
         }
 
-        $bookTags = $this->entityManager->getRepository(\App\Entity\BookTags::class)->findBy(['tags' => $tag]);
-        foreach ($bookTags as $bt) {
-            $this->entityManager->remove($bt);
-        }
-
-        $this->entityManager->remove($tag);
-        $this->entityManager->flush();
+        $this->tagService->deleteTag($tag);
 
         return $this->json(['message' => 'Tag deleted successfully'], 200);
     }
