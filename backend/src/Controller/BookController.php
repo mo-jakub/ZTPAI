@@ -5,19 +5,19 @@ namespace App\Controller;
 use OpenApi\Attributes as OA;
 use App\Service\BookService;
 use App\Entity\Books;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class BookController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
+    private BookService $bookService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(BookService $bookService)
     {
-        $this->entityManager = $entityManager;
+        $this->bookService = $bookService;
     }
 
     #[Route('/api/books', name: 'get_books', methods: ['GET'])]
@@ -40,20 +40,10 @@ class BookController extends AbstractController
             )
         ]
     )]
-    #[Route('/api/books', name: 'get_books', methods: ['GET'])]
     public function getBooks(Request $request): JsonResponse
     {
         $search = $request->query->get('search');
-        $repo = $this->entityManager->getRepository(Books::class);
-
-        if ($search) {
-            $qb = $repo->createQueryBuilder('b');
-            $qb->where('LOWER(b.title) LIKE :search')
-            ->setParameter('search', '%' . strtolower($search) . '%');
-            $books = $qb->getQuery()->getResult();
-        } else {
-            $books = $repo->findAll();
-        }
+        $books = $this->bookService->getBooks($search);
 
         $data = array_map(function (Books $book) {
             return [
@@ -97,57 +87,13 @@ class BookController extends AbstractController
     )]
     public function getBookById(int $id): JsonResponse
     {
-        $book = $this->entityManager->getRepository(books::class)->find($id);
+        $book = $this->bookService->getBookById($id);
 
         if (!$book) {
             return $this->json(['error' => 'No book found for id ' . $id], 404);
         }
 
-        $bookAuthors = $this->entityManager->getRepository(\App\Entity\BookAuthors::class)->findBy(['books' => $book]);
-        $authors = [];
-        foreach ($bookAuthors as $ba) {
-            $author = $ba->getAuthors();
-            if ($author) {
-                $authors[] = [
-                    'id' => $author->getId(),
-                    'author' => $author->getAuthor(),
-                ];
-            }
-        }
-
-        $bookGenres = $this->entityManager->getRepository(\App\Entity\BookGenres::class)->findBy(['books' => $book]);
-        $genres = [];
-        foreach ($bookGenres as $bg) {
-            $genre = $bg->getGenres();
-            if ($genre) {
-                $genres[] = [
-                    'id' => $genre->getId(),
-                    'genre' => $genre->getGenre(),
-                ];
-            }
-        }
-
-        $bookTags = $this->entityManager->getRepository(\App\Entity\BookTags::class)->findBy(['books' => $book]);
-        $tags = [];
-        foreach ($bookTags as $bt) {
-            $tag = $bt->getTags();
-            if ($tag) {
-                $tags[] = [
-                    'id' => $tag->getId(),
-                    'tag' => $tag->getTag(),
-                ];
-            }
-        }
-
-        $data = [
-            'id' => $book->getId(),
-            'title' => $book->getTitle(),
-            'description' => $book->getDescription(),
-            'cover' => $book->getCover(),
-            'authors' => $authors,
-            'genres' => $genres,
-            'tags' => $tags,
-        ];
+        $data = $this->bookService->getBookDetails($book);
 
         return $this->json($data);
     }
@@ -176,20 +122,17 @@ class BookController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $newBook = new books();
-        $newBook->setTitle($data['title'] ?? 'Default Title');
-        $newBook->setDescription($data['description'] ?? 'Default Description');
-        $newBook->setCover($data['cover'] ?? null);
+        $newBook = $this->bookService->addBook($data);
 
-        $this->entityManager->persist($newBook);
-        $this->entityManager->flush();
-
-        return $this->json(['message' => 'Saved new book with id ' . $newBook->getId(), 'book' => [
-            'id' => $newBook->getId(),
-            'title' => $newBook->getTitle(),
-            'description' => $newBook->getDescription(),
-            'cover' => $newBook->getCover(),
-        ]], 201);
+        return $this->json([
+            'message' => 'Saved new book with id ' . $newBook->getId(),
+            'book' => [
+                'id' => $newBook->getId(),
+                'title' => $newBook->getTitle(),
+                'description' => $newBook->getDescription(),
+                'cover' => $newBook->getCover(),
+            ]
+        ], 201);
     }
 
     #[Route('/api/books/{id}', name: 'delete_book_by_id', methods: ['DELETE'])]
@@ -223,14 +166,13 @@ class BookController extends AbstractController
     )]
     public function deleteBookById(int $id): JsonResponse
     {
-        $book = $this->entityManager->getRepository(books::class)->find($id);
+        $book = $this->bookService->getBookById($id);
 
         if (!$book) {
             return $this->json(['error' => 'No book found for id ' . $id], 404);
         }
 
-        $this->entityManager->remove($book);
-        $this->entityManager->flush();
+        $this->bookService->deleteBook($book);
 
         return $this->json(['message' => 'Book deleted successfully'], 200);
     }

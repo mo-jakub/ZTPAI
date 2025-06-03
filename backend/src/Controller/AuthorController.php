@@ -3,28 +3,26 @@
 namespace App\Controller;
 
 use App\Entity\Authors;
+use App\Service\AuthorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Entity\BookAuthors;
-use App\Entity\Books;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class AuthorController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
+    private AuthorService $authorService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(AuthorService $authorService)
     {
-        $this->entityManager = $entityManager;
+        $this->authorService = $authorService;
     }
 
     #[Route('/api/authors', name: 'get_authors', methods: ['GET'])]
     public function getAuthors(): JsonResponse
     {
-        $authors = $this->entityManager->getRepository(Authors::class)->findAll();
+        $authors = $this->authorService->getAllAuthors();
 
         $data = array_map(function (Authors $author) {
             return [
@@ -39,27 +37,23 @@ final class AuthorController extends AbstractController
     #[Route('/api/authors/{id}', name: 'get_books_by_author', methods: ['GET'])]
     public function getBooksByAuthor(int $id): JsonResponse
     {
-        $author = $this->entityManager->getRepository(Authors::class)->find($id);
+        $author = $this->authorService->getAuthorById($id);
         if (!$author) {
             return $this->json(['error' => 'No author found for id ' . $id], 404);
         }
 
-        $bookAuthors = $this->entityManager->getRepository(BookAuthors::class)->findBy(['authors' => $author]);
+        $books = $this->authorService->getBooksByAuthor($author);
 
-        $books = [];
-        foreach ($bookAuthors as $ba) {
-            $book = $ba->getBooks();
-            if ($book) {
-                $books[] = [
-                    'id' => $book->getId(),
-                    'title' => $book->getTitle(),
-                    'description' => $book->getDescription(),
-                    'cover' => $book->getCover(),
-                ];
-            }
-        }
+        $data = array_map(function ($book) {
+            return [
+                'id' => $book->getId(),
+                'title' => $book->getTitle(),
+                'description' => $book->getDescription(),
+                'cover' => $book->getCover(),
+            ];
+        }, $books);
 
-        return $this->json($books);
+        return $this->json($data);
     }
 
     #[Route('/api/authors', name: 'add_author', methods: ['POST'])]
@@ -72,11 +66,7 @@ final class AuthorController extends AbstractController
             return $this->json(['error' => 'Author name is required'], 400);
         }
 
-        $author = new Authors();
-        $author->setAuthor($data['author']);
-
-        $this->entityManager->persist($author);
-        $this->entityManager->flush();
+        $author = $this->authorService->addAuthor($data['author']);
 
         return $this->json([
             'message' => 'Author added successfully',
@@ -91,18 +81,12 @@ final class AuthorController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function deleteAuthor(int $id): JsonResponse
     {
-        $author = $this->entityManager->getRepository(Authors::class)->find($id);
+        $author = $this->authorService->getAuthorById($id);
         if (!$author) {
             return $this->json(['error' => 'No author found for id ' . $id], 404);
         }
 
-        $bookAuthors = $this->entityManager->getRepository(\App\Entity\BookAuthors::class)->findBy(['authors' => $author]);
-        foreach ($bookAuthors as $ba) {
-            $this->entityManager->remove($ba);
-        }
-
-        $this->entityManager->remove($author);
-        $this->entityManager->flush();
+        $this->authorService->deleteAuthor($author);
 
         return $this->json(['message' => 'Author deleted successfully'], 200);
     }
