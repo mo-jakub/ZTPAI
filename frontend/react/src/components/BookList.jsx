@@ -20,6 +20,9 @@ const BookList = ({ token }) => {
   const query = useQuery();
   const search = query.get('search');
   const admin = isAdmin(token);
+  const location = useLocation();
+
+  const showDelete = admin && location.pathname.includes('/admin');
 
   useEffect(() => {
     let url = '/api/books';
@@ -51,7 +54,7 @@ const BookList = ({ token }) => {
         {books.map(book => (
           <li key={book.id}>
             <Link to={`/books/${book.id}`} className='nav-link'>{book.title}</Link>
-            {admin && (
+            {showDelete && (
               <button
                 onClick={() => handleDelete(book.id)}
                 style={{ marginLeft: 8 }}

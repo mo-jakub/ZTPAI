@@ -41,6 +41,8 @@ const EntityList = ({ token, entityType: propEntityType }) => {
 
   const config = entityConfig[entityType];
 
+  const showDelete = admin && location.pathname.includes('/admin');
+
   useEffect(() => {
     if (!config) return;
     const fetchEntities = async () => {
@@ -70,11 +72,11 @@ const EntityList = ({ token, entityType: propEntityType }) => {
   return (
     <ul>
       {entities.map(e => (
-        <li key={e.id}>
+        <li key={e.id} style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
           <Link to={config.link(e.id)} className='nav-link'>
             {e[config.display]}
           </Link>
-          {admin && (
+          {showDelete && (
             <button onClick={() => handleDelete(e.id)} style={{ marginLeft: 8 }}>Delete</button>
           )}
         </li>
