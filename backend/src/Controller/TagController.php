@@ -96,6 +96,11 @@ final class TagController extends AbstractController
             return $this->json(['error' => 'No tag found for id ' . $id], 404);
         }
 
+        $bookTags = $this->entityManager->getRepository(\App\Entity\BookTags::class)->findBy(['tags' => $tag]);
+        foreach ($bookTags as $bt) {
+            $this->entityManager->remove($bt);
+        }
+
         $this->entityManager->remove($tag);
         $this->entityManager->flush();
 

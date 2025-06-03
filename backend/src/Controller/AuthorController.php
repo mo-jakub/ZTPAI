@@ -96,6 +96,11 @@ final class AuthorController extends AbstractController
             return $this->json(['error' => 'No author found for id ' . $id], 404);
         }
 
+        $bookAuthors = $this->entityManager->getRepository(\App\Entity\BookAuthors::class)->findBy(['authors' => $author]);
+        foreach ($bookAuthors as $ba) {
+            $this->entityManager->remove($ba);
+        }
+
         $this->entityManager->remove($author);
         $this->entityManager->flush();
 

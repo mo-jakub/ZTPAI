@@ -96,6 +96,11 @@ final class GenreController extends AbstractController
             return $this->json(['error' => 'No genre found for id ' . $id], 404);
         }
 
+        $bookGenres = $this->entityManager->getRepository(\App\Entity\BookGenres::class)->findBy(['genres' => $genre]);
+        foreach ($bookGenres as $bg) {
+            $this->entityManager->remove($bg);
+        }
+
         $this->entityManager->remove($genre);
         $this->entityManager->flush();
 
