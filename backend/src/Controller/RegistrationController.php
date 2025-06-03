@@ -2,38 +2,26 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
-use App\Message\UserRegisteredMessage;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\RegistrationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class RegistrationController extends AbstractController
 {
     #[Route('/api/register', name: 'api_register', methods: ['POST'])]
     public function register(
-        Request $request, 
-        UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $entityManager,
-        MessageBusInterface $bus
+        Request $request,
+        RegistrationService $registrationService
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
-        $user = new User();
-        $user->setEmail($data['email']);
-        $user->setRoles(['ROLE_USER']);
+        if (empty($data['email']) || empty($data['password'])) {
+            return $this->json(['error' => 'Email and password are required'], 400);
+        }
 
-        $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
-        $user->setPassword($hashedPassword);
-
-        $entityManager->persist($user);
-        $entityManager->flush();
-
-        $bus->dispatch(new UserRegisteredMessage($user->getEmail()));
+        $registrationService->register($data['email'], $data['password']);
 
         return $this->json(['message' => 'User registered successfully']);
     }

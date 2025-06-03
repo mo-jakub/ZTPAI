@@ -43,5 +43,11 @@ services:
         arguments:
             $jwtManager: '@lexik_jwt_authentication.jwt_manager'
 
+    App\Service\RegistrationService:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+            $passwordHasher: '@security.user_password_hasher'
+            $bus: '@messenger.bus.default'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
