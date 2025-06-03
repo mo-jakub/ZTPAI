@@ -5,6 +5,11 @@ const LoginForm = ({ onToken }) => {
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
 
+  const setCookie = (name, value, days) => {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setMsg('');
@@ -17,6 +22,7 @@ const LoginForm = ({ onToken }) => {
       const data = await response.json();
       if (response.ok && data.token) {
         setMsg('Login successful!');
+        setCookie('jwt_token', data.token, 0.02); // 30 minutes
         onToken(data.token);
       } else {
         setMsg(data.message || data.error || 'Login failed');
@@ -27,12 +33,12 @@ const LoginForm = ({ onToken }) => {
   };
 
   return (
-    <main class="page">
-      <div class="info">
-        <img src="/images/on-page-logo.svg" alt="Logo" class="on-page-logo"/>
+    <main className="page">
+      <div className="info">
+        <img src="/images/on-page-logo.svg" alt="Logo" className="on-page-logo"/>
         <h2>We're glad to have you back.</h2>
       </div>
-      <div class="auth-form">
+      <div className="auth-form">
         <form onSubmit={handleLogin}>
           <h2>Log Into an Existing Account</h2>
           <input
