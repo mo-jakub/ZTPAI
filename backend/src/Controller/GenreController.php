@@ -3,28 +3,26 @@
 namespace App\Controller;
 
 use App\Entity\Genres;
-use App\Entity\BookGenres;
-use App\Entity\Books;
+use App\Service\GenreService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class GenreController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
+    private GenreService $genreService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(GenreService $genreService)
     {
-        $this->entityManager = $entityManager;
+        $this->genreService = $genreService;
     }
 
     #[Route('/api/genres', name: 'get_genres', methods: ['GET'])]
     public function getGenres(): JsonResponse
     {
-        $genres = $this->entityManager->getRepository(Genres::class)->findAll();
+        $genres = $this->genreService->getAllGenres();
 
         $data = array_map(function (Genres $genre) {
             return [
@@ -39,25 +37,12 @@ final class GenreController extends AbstractController
     #[Route('/api/genres/{id}', name: 'get_books_by_genre', methods: ['GET'])]
     public function getBooksByGenre(int $id): JsonResponse
     {
-        $genre = $this->entityManager->getRepository(Genres::class)->find($id);
+        $genre = $this->genreService->getGenreById($id);
         if (!$genre) {
             return $this->json(['error' => 'No genre found for id ' . $id], 404);
         }
 
-        $bookGenres = $this->entityManager->getRepository(BookGenres::class)->findBy(['genres' => $genre]);
-
-        $books = [];
-        foreach ($bookGenres as $ba) {
-            $book = $ba->getBooks();
-            if ($book) {
-                $books[] = [
-                    'id' => $book->getId(),
-                    'title' => $book->getTitle(),
-                    'description' => $book->getDescription(),
-                    'cover' => $book->getCover(),
-                ];
-            }
-        }
+        $books = $this->genreService->getBooksByGenre($genre);
 
         return $this->json($books);
     }
@@ -72,11 +57,7 @@ final class GenreController extends AbstractController
             return $this->json(['error' => 'Genre name is required'], 400);
         }
 
-        $genre = new Genres();
-        $genre->setGenre($data['genre']);
-
-        $this->entityManager->persist($genre);
-        $this->entityManager->flush();
+        $genre = $this->genreService->addGenre($data['genre']);
 
         return $this->json([
             'message' => 'Genre added successfully',
@@ -91,18 +72,12 @@ final class GenreController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function deleteGenre(int $id): JsonResponse
     {
-        $genre = $this->entityManager->getRepository(Genres::class)->find($id);
+        $genre = $this->genreService->getGenreById($id);
         if (!$genre) {
             return $this->json(['error' => 'No genre found for id ' . $id], 404);
         }
 
-        $bookGenres = $this->entityManager->getRepository(\App\Entity\BookGenres::class)->findBy(['genres' => $genre]);
-        foreach ($bookGenres as $bg) {
-            $this->entityManager->remove($bg);
-        }
-
-        $this->entityManager->remove($genre);
-        $this->entityManager->flush();
+        $this->genreService->deleteGenre($genre);
 
         return $this->json(['message' => 'Genre deleted successfully'], 200);
     }
