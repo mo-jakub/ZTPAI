@@ -1,11 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+function isAdmin(token) {
+  if (!token) return false;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.roles && payload.roles.includes('ROLE_ADMIN');
+  } catch {
+    return false;
+  }
+}
+
 function parseJwt(token) {
   if (!token) return null;
   try {
     return JSON.parse(atob(token.split('.')[1]));
-  } catch {
+  } catch (e) {
     return null;
   }
 }
@@ -24,11 +34,11 @@ const Header = ({ token, onLogout }) => {
             <img src="/images/header/home.svg" alt="" className="logo" />
             Home
           </Link>
-          <Link to="/entities?type=genre" className="nav-link">
+          <Link to="/genres" className="nav-link">
             <img src="/images/header/box.svg" alt="" className="logo" />
             Genres
           </Link>
-          <Link to="/entities?type=tag" className="nav-link">
+          <Link to="/tags" className="nav-link">
             <img src="/images/header/tag.svg" alt="" className="logo" />
             Tags
           </Link>
@@ -47,8 +57,8 @@ const Header = ({ token, onLogout }) => {
                 <img src="/images/user.svg" alt="" className="logo" />
                 {user?.username || 'User'}
               </Link>
-              {user?.role === 'admin' && (
-                <Link to="/administration" className="nav-link">
+              {isAdmin(token) && (
+                <Link to="/admin" className="nav-link">
                   <img src="/images/header/admin.svg" alt="" className="logo" />
                   Administration
                 </Link>
