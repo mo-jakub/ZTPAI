@@ -71,7 +71,7 @@ const EntityList = ({ token, entityType: propEntityType }) => {
     <ul>
       {entities.map(e => (
         <li key={e.id}>
-          <Link to={config.link(e.id)} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to={config.link(e.id)} className='nav-link'>
             {e[config.display]}
           </Link>
           {admin && (
