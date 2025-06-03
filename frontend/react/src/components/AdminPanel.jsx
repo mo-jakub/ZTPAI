@@ -41,14 +41,6 @@ const AdminPanel = ({ token }) => {
           <button
             key={section.key}
             onClick={() => setActiveSection(section.key)}
-            style={{
-              padding: '8px 16px',
-              background: activeSection === section.key ? '#007bff' : '#eee',
-              color: activeSection === section.key ? '#fff' : '#222',
-              border: 'none',
-              borderRadius: 4,
-              cursor: 'pointer'
-            }}
           >
             {section.label}
           </button>

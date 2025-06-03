@@ -88,17 +88,6 @@ const AddBookForm = ({ token }) => {
       </table>
       <button
         type="submit"
-        style={{
-          marginTop: '20px',
-          padding: '10px 20px',
-          backgroundColor: '#007BFF',
-          color: '#fff',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'block',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-        }}
       >
         Add Book
       </button>
